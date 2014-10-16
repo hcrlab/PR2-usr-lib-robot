@@ -172,8 +172,44 @@ def cmd_start(argv):
                       help="Use a different username when claiming the robot.")
     parser.add_option("-f", "--force",   action="store_true", dest="force",
                       help="Don't warn if you are claiming from another user.")
+    parser.add_option(
+        "--no_prosilica",
+        action="store_true",
+        dest="no_prosilica",
+        default=False,
+        help="Disable the prosilica cameras."
+    )
+    parser.add_option(
+        "--no_webui",
+        action="store_true",
+        dest="no_webui",
+        default=False,
+        help="Disable the Willow Garage webui (needs additional setup to work)."
+    )
+    parser.add_option(
+        "--no_tilt_laser",
+        action="store_true",
+        dest="no_tilt_laser",
+        default=False,
+        help="Disable the tilt laser."
+    )
+    parser.add_option(
+        "--no_stereo_camera",
+        action="store_true",
+        dest="no_stereo_camera",
+        default=False,
+        help="Disable the stereo camera."
+    )
 
     (options,args) = parser.parse_args(argv)
+
+    roslaunch_args = {
+        'no-prosilica': options.no_prosilica,
+        'no-webui': options.no_webui,
+        'no-tilt-laser': options.no_tilt_laser,
+        'no-stereo-camera': options.no_stereo_camera
+    }
+    roslaunch_args_str = ['{}:={}'.format(k, "true" if v else "false") for k, v in roslaunch_args.items()]
 
     checkslave()
 
@@ -245,9 +281,9 @@ def cmd_start(argv):
             env['LD_LIBRARY_PATH'] = env['LIBRARY_PATH']
 
         if options.system:
-            subprocess.Popen(['sudo', '-u', 'ros', '/usr/lib/robot/roslaunch_ros', '--pid', PID_FILE], env=env)
+            subprocess.Popen(['sudo', '-u', 'ros', '/usr/lib/robot/roslaunch_ros', '--pid', PID_FILE] + roslaunch_args_str, env=env)
         else:
-            subprocess.Popen(['roslaunch', '/etc/ros/robot.launch', '--pid', PID_FILE], env=env)
+            subprocess.Popen(['roslaunch', '/etc/ros/robot.launch', '--pid', PID_FILE] + roslaunch_args_str, env=env)
 
         sys.exit(0)
 
