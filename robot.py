@@ -268,6 +268,8 @@ def cmd_stop(argv):
     if not check_claim(options.user, options.force):
         sys.exit(2)
 
+    print "Tilting the head back in preparation for shutdown."
+    subprocess.call(["/usr/lib/robot/look_up.sh"])
 
     if ckill_prompt(options.force):
         ckill()
