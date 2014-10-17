@@ -186,13 +186,14 @@ def cmd_start(argv):
         default=False,
         help="Disable the Willow Garage webui (needs additional setup to work)."
     )
-    parser.add_option(
-        "--no_tilt_laser",
-        action="store_true",
-        dest="no_tilt_laser",
-        default=False,
-        help="Disable the tilt laser."
-    )
+    # This breaks interactive manipulation for some reason.
+    #parser.add_option(
+    #    "--no_tilt_laser",
+    #    action="store_true",
+    #    dest="no_tilt_laser",
+    #    default=False,
+    #    help="Disable the tilt laser."
+    #)
     parser.add_option(
         "--no_stereo_camera",
         action="store_true",
@@ -206,7 +207,7 @@ def cmd_start(argv):
     roslaunch_args = {
         'no-prosilica': options.no_prosilica,
         'no-webui': options.no_webui,
-        'no-tilt-laser': options.no_tilt_laser,
+        #'no-tilt-laser': options.no_tilt_laser,
         'no-stereo-camera': options.no_stereo_camera
     }
     roslaunch_args_str = ['{}:={}'.format(k, "true" if v else "false") for k, v in roslaunch_args.items()]
