@@ -279,7 +279,6 @@ def cmd_stop(argv):
     if not check_claim(options.user, options.force):
         sys.exit(2)
 
-
     if ckill_prompt(options.force):
         ckill()
 
@@ -676,6 +675,9 @@ def ckill():
 
     # Only need to actually do the killing if the count was > 0
     if count > 0:
+        print "Tilting the head back in preparation for shutdown."
+        subprocess.call(["/usr/lib/robot/look_up.sh"])
+
         total_count = count
         total_progress = 50
         progress = 0.
