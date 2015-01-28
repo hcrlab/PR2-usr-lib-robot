@@ -157,6 +157,17 @@ def cmd_release(argv):
 
 
 
+def cmd_groovy(argv):
+    print "Setting your ROS Environment to ROS Groovy"
+    os.system("sudo ln -sfn /etc/ros/groovy /etc/ros/distro")
+
+    print "/etc/ros/distro is now symbolically linked to /etc/ros/groovy"
+  
+def cmd_hydro(argv):
+    print "Setting your ROS Environment to ROS Hydro"
+    os.system("sudo ln -sfn /etc/ros/hydro /etc/ros/distro")
+    print "/etc/ros/distro is now symbolically linked to /etc/ros/hydro"
+
 def cmd_start(argv):
     parser = OptionParser(usage="robot start",
                           description="Bring up the robot.  This will first kill all processes running on the robot and then launch /etc/ros/robot.launch as a daemonized process.")
@@ -172,45 +183,8 @@ def cmd_start(argv):
                       help="Use a different username when claiming the robot.")
     parser.add_option("-f", "--force",   action="store_true", dest="force",
                       help="Don't warn if you are claiming from another user.")
-    parser.add_option(
-        "--no_prosilica",
-        action="store_true",
-        dest="no_prosilica",
-        default=False,
-        help="Disable the prosilica cameras."
-    )
-    parser.add_option(
-        "--no_webui",
-        action="store_true",
-        dest="no_webui",
-        default=False,
-        help="Disable the Willow Garage webui (needs additional setup to work)."
-    )
-    # This breaks interactive manipulation for some reason.
-    #parser.add_option(
-    #    "--no_tilt_laser",
-    #    action="store_true",
-    #    dest="no_tilt_laser",
-    #    default=False,
-    #    help="Disable the tilt laser."
-    #)
-    parser.add_option(
-        "--no_stereo_camera",
-        action="store_true",
-        dest="no_stereo_camera",
-        default=False,
-        help="Disable the stereo camera."
-    )
 
     (options,args) = parser.parse_args(argv)
-
-    roslaunch_args = {
-        'no-prosilica': options.no_prosilica,
-        'no-webui': options.no_webui,
-        #'no-tilt-laser': options.no_tilt_laser,
-        'no-stereo-camera': options.no_stereo_camera
-    }
-    roslaunch_args_str = ['{}:={}'.format(k, "true" if v else "false") for k, v in roslaunch_args.items()]
 
     checkslave()
 
@@ -282,9 +256,9 @@ def cmd_start(argv):
             env['LD_LIBRARY_PATH'] = env['LIBRARY_PATH']
 
         if options.system:
-            subprocess.Popen(['sudo', '-u', 'ros', '/usr/lib/robot/roslaunch_ros', '--pid', PID_FILE] + roslaunch_args_str, env=env)
+            subprocess.Popen(['sudo', '-u', 'ros', '/usr/lib/robot/roslaunch_ros', '--pid', PID_FILE], env=env)
         else:
-            subprocess.Popen(['roslaunch', '/etc/ros/robot.launch', '--pid', PID_FILE] + roslaunch_args_str, env=env)
+            subprocess.Popen(['roslaunch', '/etc/ros/robot.launch', '--pid', PID_FILE], env=env)
 
         sys.exit(0)
 
@@ -305,14 +279,89 @@ def cmd_stop(argv):
     if not check_claim(options.user, options.force):
         sys.exit(2)
 
-    print "Tilting the head back in preparation for shutdown."
-    subprocess.call(["/usr/lib/robot/look_up.sh"])
 
     if ckill_prompt(options.force):
         ckill()
 
         print "If you are done using the robot, it is recommended that you run 'robot release'"
 
+    sys.exit(0)
+
+
+def cmd_dash(argv):
+    print """
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMNMMMMMMMMMMMMMMMMMMMMMMMMMMNMMMMMMMMMMM
+MMMMMMMMMMNMMMMMMMMMMmhhhhhhmMMMMMMMMMMNMMMMMMMMMM
+MMMMMMMMNNMMMMMMMMMMd::::::::hMMMMMMMMMMNNMMMMMMMM
+MMMMMMMNNMMMMMMMMMMh::::::::::yMMMMMMMMMMNNMMMMMMM
+MMMMMMNNMMMdhhhhhdN/:::::::::::mMmydddddymMNMMMMMM
+MMMMMNMMMMo:::::::sN+::::::::/mMdhMMMMMMMydMNMMMMM
+MMMMNMMMN+:::::::::+No::::::+NMhdMMMMMMMMMhhMNMMMM
+MMMNMMMMs:::::::::::yMMMMMMMMMMmyMMMMMMMMMymMMNNMM
+MNNMMMMMMs:::::::::yMMMMMMMMMMMMNsNMMMMMNsNMMMMNNM
+NNMMMMMMMMy:::::::hMMMMMMMMMMMMMMNhdddddhNMMMMMMNN
+mMMMMMMMMMMdhhhhhdMMMMMMMMMMMMMMmddddddMMMMMMMMMMN
+MNMMMMMMMMs:::::::yMMMMMMMMMMMMh:::::::oNMMMMMMMNN
+MMNMMMMMMo:::::::::oMMMMMMMMMMy:::::::::+NMMMMMNNM
+MMMNMMMMs:::::::::::yMmmmmmmNh:::::::::::+MMMMNMMM
+MMMMNMMMMo:::::::::oN+::::::/my:::::::::+NMMMNMMMM
+MMMMMNNMMMs:::::::ym/:::::::::dh:::::::oNMMMNMMMMM
+MMMMMMNNMMMmdddddmN/:::::::::::mmdddddmMMMNNMMMMMM
+MMMMMMMNNMMMMMMMMMMd::::::::::hMMMMMMMMMMNNMMMMMMM
+MMMMMMMMMNMMMMMMMMMMm/:::::::dMMMMMMMMMMNNMMMMMMMM
+MMMMMMMMMMNMMMMMMMMMMNddddddNMMMMMMMMMMNMMMMMMMMMM
+MMMMMMMMMMMNMMMMMMMMMMMMMMMMMMMMMMMMMMNMMMMMMMMMMM
+MMMMMMMMMMMMNNNNNNNNNNNNNNNNNNNNNNNNNNMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+
+A boy with dreams had dreamt,
+That our feet and lives were meant
+for the sands of Mars.
+And by the hands of ours
+the lands of stars; humans were sent.
+
+He asked, please, the men,
+and the women, of the greatest alliance upon earth
+Please, our best is yet to come, to the sun,
+our work.
+
+To the stars we must go
+
+"""
+    sys.exit(0)
+
+def cmd_sudoaptgetbrycefixit(argv):
+    print """
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMNMMMMMMMMMMMMMMMMMMMMMMMMMMNMMMMMMMMMMM
+MMMMMMMMMMNMMMMMMMMMMmhhhhhhmMMMMMMMMMMNMMMMMMMMMM
+MMMMMMMMNNMMMMMMMMMMd::::::::hMMMMMMMMMMNNMMMMMMMM
+MMMMMMMNNMMMMMMMMMMh::::::::::yMMMMMMMMMMNNMMMMMMM
+MMMMMMNNMMMdhhhhhdN/:::::::::::mMmydddddymMNMMMMMM
+MMMMMNMMMMo:::::::sN+::::::::/mMdhMMMMMMMydMNMMMMM
+MMMMNMMMN+:::::::::+No::::::+NMhdMMMMMMMMMhhMNMMMM
+MMMNMMMMs:::::::::::yMMMMMMMMMMmyMMMMMMMMMymMMNNMM
+MNNMMMMMMs:::::::::yMMMMMMMMMMMMNsNMMMMMNsNMMMMNNM
+NNMMMMMMMMy:::::::hMMMMMMMMMMMMMMNhdddddhNMMMMMMNN
+mMMMMMMMMMMdhhhhhdMMMMMMMMMMMMMMmddddddMMMMMMMMMMN
+MNMMMMMMMMs:::::::yMMMMMMMMMMMMh:::::::oNMMMMMMMNN
+MMNMMMMMMo:::::::::oMMMMMMMMMMy:::::::::+NMMMMMNNM
+MMMNMMMMs:::::::::::yMmmmmmmNh:::::::::::+MMMMNMMM
+MMMMNMMMMo:::::::::oN+::::::/my:::::::::+NMMMNMMMM
+MMMMMNNMMMs:::::::ym/:::::::::dh:::::::oNMMMNMMMMM
+MMMMMMNNMMMmdddddmN/:::::::::::mmdddddmMMMNNMMMMMM
+MMMMMMMNNMMMMMMMMMMd::::::::::hMMMMMMMMMMNNMMMMMMM
+MMMMMMMMMNMMMMMMMMMMm/:::::::dMMMMMMMMMMNNMMMMMMMM
+MMMMMMMMMMNMMMMMMMMMMNddddddNMMMMMMMMMMNMMMMMMMMMM
+MMMMMMMMMMMNMMMMMMMMMMMMMMMMMMMMMMMMMMNMMMMMMMMMMM
+MMMMMMMMMMMMNNNNNNNNNNNNNNNNNNNNNNNNNNMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+Email Bryce (bvondervoort@clearpathrobotics.com).
+He'll fix it.
+"""
     sys.exit(0)
 
 def cmd_love(argv):
@@ -730,6 +779,10 @@ def robotmain(argv=None):
     cmds['plist']    = (cmd_plist,   'Show all processes running on the robot.')
     cmds['love']     = (cmd_love,   '')
     cmds['kill']     = (cmd_stop,    '')
+    cmds['sudoaptgetbrycefixit'] = (cmd_sudoaptgetbrycefixit, '')
+    cmds['dash']     = (cmd_dash, '')
+    cmds['hydro']    = (cmd_hydro, 'Changes the ROS Environment to Hydro; An ease of use command')
+    cmds['groovy']   = (cmd_groovy, 'Changes the ROS Environment to Groovy; An ease of use command')
 
     if argv is None:
         argv=sys.argv
