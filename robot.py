@@ -21,7 +21,7 @@ import UserDict
 
 # If the user claims the robot without a message, a tip will be shown with
 # this probability.
-CLAIM_TIP_PROB = 0.25
+CLAIM_TIP_PROB = 0.5
 
 USERNAME = 'ros'
 PID_FILE = '/var/tmp/ros.pid'
