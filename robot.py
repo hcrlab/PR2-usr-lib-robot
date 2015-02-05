@@ -14,9 +14,14 @@ import time
 import yaml
 import socket
 import string
+import random
 
 from optparse import OptionParser
 import UserDict
+
+# If the user claims the robot without a message, a tip will be shown with
+# this probability.
+CLAIM_TIP_PROB = 0.25
 
 USERNAME = 'ros'
 PID_FILE = '/var/tmp/ros.pid'
@@ -601,6 +606,19 @@ def check_claim(user, force):
 
     return True
 
+def show_claim_tip(rng, prob):
+    """Shows a tip about the -m option with some probability.
+
+    Args:
+        rng: Anything with a .random() method that returns a number in [0, 1)
+        prob: The probability [0, 1] with which to show the tip.
+    """
+    if rng.random() < prob:
+        print (
+            "Tip: leave a message for others with "
+            "robot claim -m \"My message.\""
+        )
+
 def claim(user, email, message, force):
     new_active = ActiveUser()
 
@@ -617,6 +635,8 @@ def claim(user, email, message, force):
     old_active = load_active()
 
     if old_active is None:
+        if message is None:
+            show_claim_tip(random, CLAIM_TIP_PROB)
         print "Taking control of the robot."
         new_active.set_active()
     elif old_active.user != new_active.user:
@@ -631,6 +651,8 @@ def claim(user, email, message, force):
                     sys.exit(1)
 
         print "Stealing control of the robot from %s."%old_active.user
+        if message is None:
+            show_claim_tip(random, CLAIM_TIP_PROB)
         if old_active.email is not None:
             send_mail(old_active.email,"Lost control of robot to: %s"%new_active.user,new_active.message)
         new_active.set_active()
