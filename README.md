@@ -4,3 +4,4 @@
 ## Current changes
 - Makes the robot's head tilt up (`look_up.sh`) before the robot is stopped. This prevents the head from slamming down too hard.
 - Randomly shows a tip about `robot claim -m` if the robot is claimed without the `-m` option.
+- Informs users that it's okay to kill rws processes.
