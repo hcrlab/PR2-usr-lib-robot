@@ -674,6 +674,7 @@ def ckill_prompt(force):
         users()
         print ""
         while True:
+            print "It is okay to kill processes from rws."
             yesno = raw_input("Kill these processes? [(y)es/(n)o/(s)how]:")
             if yesno.lower()=="y" or yesno.lower()=="yes":
                 return True
